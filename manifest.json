@@ -1,0 +1,12 @@
+{
+  "display_name": "EPhone Chat Import",
+  "loading_order": 100,
+  "requires": [],
+  "optional": [],
+  "js": "index.js",
+  "css": "style.css",
+  "author": "EPhone-Vue",
+  "version": "1.0.0",
+  "homePage": "https://github.com/your-username/SillyTavern-EPhone-Import",
+  "auto_update": true
+}

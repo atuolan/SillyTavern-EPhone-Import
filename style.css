@@ -1,0 +1,153 @@
+/* EPhone Chat Import Extension Styles */
+
+#ephone-import-settings {
+  margin: 10px 0;
+}
+
+.ephone-import-container {
+  padding: 15px;
+  background: var(--SmartThemeBlurTintColor);
+  border-radius: 10px;
+}
+
+.ephone-import-container h3 {
+  margin: 0 0 15px 0;
+  color: var(--SmartThemeBodyColor);
+  font-size: 1.2em;
+}
+
+.ephone-import-container h4 {
+  margin: 15px 0 10px 0;
+  color: var(--SmartThemeBodyColor);
+  font-size: 1em;
+}
+
+.ephone-import-description {
+  background: var(--black30a);
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  border-left: 3px solid var(--SmartThemeQuoteColor);
+}
+
+.ephone-import-description p {
+  margin: 0 0 8px 0;
+  font-weight: bold;
+  color: var(--SmartThemeBodyColor);
+}
+
+.ephone-import-description ol {
+  margin: 5px 0 0 20px;
+  padding: 0;
+  color: var(--grey70);
+}
+
+.ephone-import-description li {
+  margin: 5px 0;
+  line-height: 1.5;
+}
+
+.ephone-import-actions {
+  margin: 15px 0;
+  text-align: center;
+}
+
+#ephone-import-btn {
+  padding: 12px 24px;
+  font-size: 1.1em;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+#ephone-import-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+#ephone-import-btn:active {
+  transform: translateY(0);
+}
+
+#ephone-import-btn i {
+  margin-right: 8px;
+}
+
+.ephone-import-settings {
+  background: var(--black30a);
+  padding: 12px;
+  border-radius: 8px;
+  margin-top: 15px;
+}
+
+.ephone-import-settings label {
+  display: flex;
+  align-items: center;
+  margin: 8px 0;
+  cursor: pointer;
+  color: var(--SmartThemeBodyColor);
+}
+
+.ephone-import-settings input[type='checkbox'] {
+  margin-right: 10px;
+  cursor: pointer;
+}
+
+.ephone-import-status {
+  margin-top: 15px;
+  padding: 12px;
+  border-radius: 8px;
+  display: none;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ephone-import-status.info {
+  background: rgba(52, 152, 219, 0.2);
+  border-left: 3px solid #3498db;
+  color: #3498db;
+}
+
+.ephone-import-status.success {
+  background: rgba(46, 204, 113, 0.2);
+  border-left: 3px solid #2ecc71;
+  color: #2ecc71;
+}
+
+.ephone-import-status.error {
+  background: rgba(231, 76, 60, 0.2);
+  border-left: 3px solid #e74c3c;
+  color: #e74c3c;
+}
+
+.ephone-import-status.warning {
+  background: rgba(241, 196, 15, 0.2);
+  border-left: 3px solid #f1c40f;
+  color: #f1c40f;
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+  .ephone-import-container {
+    padding: 10px;
+  }
+
+  #ephone-import-btn {
+    width: 100%;
+    padding: 10px 20px;
+  }
+}
