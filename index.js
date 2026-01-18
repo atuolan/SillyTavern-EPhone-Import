@@ -298,13 +298,31 @@
   }
 
   /**
+   * 獲取 CSRF Token
+   */
+  function getCSRFToken() {
+    const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+    return token || '';
+  }
+
+  /**
    * 檢查角色是否存在
    */
   async function checkCharacterExists(characterName) {
     try {
+      // 使用 SillyTavern 的內部 API
+      const context = window.SillyTavern?.getContext?.();
+      if (context && context.characters) {
+        return context.characters.some(char => char.name === characterName);
+      }
+
+      // 降級方案：使用 fetch
       const response = await fetch('/api/characters/all', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': getCSRFToken(),
+        },
       });
 
       if (!response.ok) return false;
@@ -321,27 +339,49 @@
    * 從 EPhone 數據創建角色
    */
   async function createCharacterFromEPhone(ephoneData) {
-    const characterData = {
-      name: ephoneData.characterName,
-      description: `從 EPhone-Vue 導入的角色\n\n${ephoneData.conversationSummary || ''}`,
-      personality: '',
-      scenario: '',
-      first_mes: '你好！',
-      mes_example: '',
-      creator_notes: 'Imported from EPhone-Vue',
-      system_prompt: '',
-      post_history_instructions: '',
-      tags: ['ephone-import'],
-      creator: 'EPhone-Vue',
-      character_version: '1.0.0',
-      avatar: ephoneData.characterAvatar || 'default.png',
-    };
-
     try {
+      // 使用 SillyTavern 的內部 API（如果可用）
+      if (window.SillyTavern?.getContext) {
+        const context = window.SillyTavern.getContext();
+
+        // 創建簡單的角色數據
+        const characterData = {
+          name: ephoneData.characterName,
+          description: `從 EPhone-Vue 導入的角色\n\n${ephoneData.conversationSummary || ''}`,
+          personality: '',
+          scenario: '',
+          first_mes: '你好！',
+          mes_example: '',
+          creator_notes: 'Imported from EPhone-Vue',
+          tags: ['ephone-import'],
+          avatar: 'default.png',
+        };
+
+        // 嘗試使用內部方法創建
+        if (typeof context.createCharacter === 'function') {
+          await context.createCharacter(characterData);
+          console.log('[EPhone Import] ✅ 角色創建成功（內部 API）');
+          return;
+        }
+      }
+
+      // 降級方案：使用 fetch
       const response = await fetch('/api/characters/create', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(characterData),
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': getCSRFToken(),
+        },
+        body: JSON.stringify({
+          name: ephoneData.characterName,
+          description: `從 EPhone-Vue 導入的角色\n\n${ephoneData.conversationSummary || ''}`,
+          personality: '',
+          scenario: '',
+          first_mes: '你好！',
+          mes_example: '',
+          creator_notes: 'Imported from EPhone-Vue',
+          tags: ['ephone-import'],
+        }),
       });
 
       if (!response.ok) {
@@ -360,9 +400,28 @@
    */
   async function saveChatToST(chatData, characterName) {
     try {
+      // 使用 SillyTavern 的內部 API
+      const context = window.SillyTavern?.getContext?.();
+
+      if (context && typeof context.saveChat === 'function') {
+        // 將消息添加到當前聊天
+        for (const message of chatData.messages) {
+          context.chat.push(message);
+        }
+
+        // 保存聊天
+        await context.saveChat();
+        console.log('[EPhone Import] ✅ 聊天記錄保存成功（內部 API）');
+        return;
+      }
+
+      // 降級方案：使用 fetch
       const response = await fetch('/api/chats/save', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': getCSRFToken(),
+        },
         body: JSON.stringify({
           ch_name: characterName,
           file_name: `EPhone_Import_${Date.now()}.jsonl`,
