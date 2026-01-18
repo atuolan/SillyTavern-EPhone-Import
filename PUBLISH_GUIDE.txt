@@ -1,0 +1,60 @@
+========================================
+GitHub 發布指南
+========================================
+
+✅ 已完成：
+- Git 倉庫已初始化
+- 所有文件已提交
+
+📝 接下來的步驟：
+
+1. 在瀏覽器打開：https://github.com/new
+
+2. 創建新倉庫：
+   - Repository name: SillyTavern-EPhone-Import
+   - Description: 📱 Import EPhone-Vue chat history into SillyTavern
+   - 選擇 Public
+   - 不要勾選任何選項（README、.gitignore、License）
+   - 點擊 Create repository
+
+3. 在 PowerShell 中執行以下命令：
+
+   cd D:\tavern_helper_template-main\SillyTavern-EPhone-Import
+
+   git remote add origin https://github.com/atuolan/SillyTavern-EPhone-Import.git
+
+   git branch -M main
+
+   git push -u origin main
+
+4. 完成！你的插件已經發布到：
+   https://github.com/atuolan/SillyTavern-EPhone-Import
+
+========================================
+其他用戶如何安裝
+========================================
+
+方法 1：手動安裝
+1. 下載你的倉庫：
+   https://github.com/atuolan/SillyTavern-EPhone-Import/archive/refs/heads/main.zip
+
+2. 解壓到：
+   SillyTavern/public/scripts/extensions/third-party/ephone-import/
+
+3. 重啟 SillyTavern
+
+方法 2：Git 克隆
+cd SillyTavern/public/scripts/extensions/third-party/
+git clone https://github.com/atuolan/SillyTavern-EPhone-Import.git ephone-import
+
+========================================
+更新插件
+========================================
+
+當你修改代碼後：
+
+git add .
+git commit -m "描述你的修改"
+git push
+
+========================================
