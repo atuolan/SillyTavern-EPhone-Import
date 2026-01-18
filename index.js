@@ -271,43 +271,46 @@
    * 轉換為 SillyTavern 格式
    */
   function convertToSTFormat(ephoneData) {
-    const messages = ephoneData.messages.map(msg => {
-      const stMessage = {
-        name: msg.senderName || (msg.role === 'user' ? 'You' : ephoneData.characterName),
-        is_user: msg.role === 'user',
-        is_system: msg.role === 'system',
-        send_date: settings.autoConvertTimestamp ? msg.timestamp : Date.now(),
-        mes: msg.content,
-        swipes: [],
-        swipe_id: 0,
-        swipe_info: [],
-      };
+    // 🔥 將所有消息合併成一條 <phone> 格式的消息
+    let phoneContent = '<phone>\n';
 
-      // 保留元數據
-      if (settings.preserveMetadata) {
-        stMessage.extra = {
-          ephone_type: msg.type,
-          ephone_timestamp: msg.timestamp,
-        };
+    ephoneData.messages.forEach(msg => {
+      const sender = msg.role === 'user' ? '{{user}}' : '{{char}}';
+      const timestamp = new Date(msg.timestamp).toLocaleString('zh-TW', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
 
-        if (msg.replyTo) {
-          stMessage.extra.ephone_reply_to = msg.replyTo;
-        }
-      }
-
-      // 處理圖片
-      if (settings.importImages && msg.imageUrl) {
-        stMessage.extra = stMessage.extra || {};
-        stMessage.extra.image = msg.imageUrl;
-      }
-
-      if (settings.importImages && msg.imageData) {
-        stMessage.extra = stMessage.extra || {};
-        stMessage.extra.inline_image = msg.imageData;
-      }
-
-      return stMessage;
+      // 格式：{{char}}: 消息內容 // 2025/01/18 12:34
+      phoneContent += `${sender}: ${msg.content} // ${timestamp}\n\n`;
     });
+
+    phoneContent += '</phone>';
+
+    // 創建單條消息
+    const singleMessage = {
+      name: ephoneData.characterName,
+      is_user: false,
+      is_system: false,
+      send_date: Date.now(),
+      mes: phoneContent,
+      swipes: [],
+      swipe_id: 0,
+      swipe_info: [],
+    };
+
+    // 保留元數據
+    if (settings.preserveMetadata) {
+      singleMessage.extra = {
+        ephone_import: true,
+        ephone_character_id: ephoneData.characterId,
+        ephone_message_count: ephoneData.messages.length,
+        ephone_import_time: Date.now(),
+      };
+    }
 
     return {
       chat_metadata: {
@@ -321,7 +324,7 @@
           important_events: ephoneData.importantEvents || [],
         },
       },
-      messages: messages,
+      messages: [singleMessage], // 只有一條消息
     };
   }
 
