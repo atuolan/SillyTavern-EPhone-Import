@@ -439,6 +439,17 @@
 
         // 保存聊天
         await context.saveChat();
+
+        // 🔥 刷新聊天界面
+        if (typeof context.reloadCurrentChat === 'function') {
+          await context.reloadCurrentChat();
+        } else if (typeof context.printMessages === 'function') {
+          context.printMessages();
+        } else {
+          // 手動觸發重新渲染
+          eventSource.emit('chatLoaded', { detail: { id: context.chatId } });
+        }
+
         console.log('[EPhone Import] ✅ 聊天記錄保存成功（內部 API）');
         return;
       }
