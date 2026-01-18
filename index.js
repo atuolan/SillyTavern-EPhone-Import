@@ -74,11 +74,15 @@
               <div class="ephone-import-description">
                 <p>📝 使用步驟：</p>
                 <ol>
+                  <li><strong>先選擇角色</strong> - 在 SillyTavern 中選擇或創建對應的角色</li>
                   <li>在 EPhone-Vue 中打開要導出的聊天</li>
                   <li>點擊右上角菜單 → 「導出到 SillyTavern」</li>
                   <li>下載 JSON 文件</li>
                   <li>點擊下方按鈕選擇文件導入</li>
                 </ol>
+                <p style="color: #f39c12; margin-top: 10px;">
+                  ⚠️ 請確保已選擇角色，否則無法導入！
+                </p>
               </div>
 
               <div class="ephone-import-actions">
@@ -210,25 +214,49 @@
       // 轉換為 SillyTavern 格式
       const stChat = convertToSTFormat(ephoneData);
 
-      // 檢查角色是否存在
-      const characterExists = await checkCharacterExists(ephoneData.characterName);
+      // 獲取當前上下文
+      const context = window.SillyTavern?.getContext?.();
 
-      if (!characterExists) {
-        const createChar = confirm(
-          `角色「${ephoneData.characterName}」不存在。\n\n` +
-            `是否創建一個新角色？\n` +
-            `（如果選擇「取消」，將使用當前選中的角色）`,
+      if (!context) {
+        throw new Error('無法獲取 SillyTavern 上下文，請確保插件正確載入');
+      }
+
+      // 檢查是否有選中的角色
+      const currentCharacter = context.name2 || context.characterId;
+
+      if (!currentCharacter) {
+        showStatus(
+          '⚠️ 請先選擇一個角色！\n\n' + '1. 在角色列表中選擇或創建角色\n' + '2. 然後再導入聊天記錄',
+          'warning',
+        );
+        return;
+      }
+
+      // 檢查角色名稱是否匹配
+      const characterMatch = currentCharacter === ephoneData.characterName;
+
+      if (!characterMatch) {
+        const proceed = confirm(
+          `當前選中的角色是：${currentCharacter}\n` +
+            `導入的聊天來自：${ephoneData.characterName}\n\n` +
+            `是否繼續導入到當前角色？`,
         );
 
-        if (createChar) {
-          await createCharacterFromEPhone(ephoneData);
+        if (!proceed) {
+          showStatus('❌ 已取消導入', 'info');
+          return;
         }
       }
 
-      // 保存聊天記錄
-      await saveChatToST(stChat, ephoneData.characterName);
+      // 保存聊天記錄（使用當前角色）
+      await saveChatToST(stChat, currentCharacter);
 
-      showStatus(`✅ 成功導入 ${stChat.messages.length} 條消息！\n` + `角色：${ephoneData.characterName}`, 'success');
+      showStatus(
+        `✅ 成功導入 ${stChat.messages.length} 條消息！\n` +
+          `角色：${currentCharacter}\n` +
+          `來源：${ephoneData.characterName}`,
+        'success',
+      );
 
       // 3秒後清除狀態
       setTimeout(() => {
